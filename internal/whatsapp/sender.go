@@ -26,9 +26,13 @@ func (s *DeviceSession) SendText(ctx context.Context, to, text string) (*SendRes
 	// Typing indicator
 	s.Client.SendChatPresence(ctx, jid, types.ChatPresenceComposing, types.ChatPresenceMediaText)
 
-	// Simulate typing delay
+	// Simulate typing delay (respects context cancellation)
 	delay := time.Duration(s.config.TypingDelay) * time.Millisecond
-	time.Sleep(delay)
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-time.After(delay):
+	}
 
 	// Stop typing
 	s.Client.SendChatPresence(ctx, jid, types.ChatPresencePaused, types.ChatPresenceMediaText)

@@ -78,23 +78,26 @@ func (s *DeviceSession) captureContact(phone, pushName string) {
 
 func (s *DeviceSession) processHistorySync(evt *events.HistorySync) {
 	data := evt.Data
-	count := 0
+	var synced []map[string]string
 
 	for _, conv := range data.GetConversations() {
 		chatJID := conv.GetID()
 		if strings.HasSuffix(chatJID, "@s.whatsapp.net") {
 			phone := strings.TrimSuffix(chatJID, "@s.whatsapp.net")
-			if err := s.Contacts.Upsert(phone, conv.GetDisplayName(), "history"); err != nil {
+			name := conv.GetDisplayName()
+			if err := s.Contacts.Upsert(phone, name, "history"); err != nil {
 				s.logger.Error().Err(err).Str("phone", phone).Msg("failed to capture history contact")
 				continue
 			}
-			count++
+			synced = append(synced, map[string]string{
+				"phone": phone,
+				"name":  name,
+			})
 		}
 	}
 
-	if count > 0 {
-		s.logger.Info().Int("count", count).Msg("contacts captured from history sync")
-		contacts, _, _ := s.Contacts.GetAll(10000, 0)
-		s.webhook.Send("contacts.sync", s.Token, contacts)
+	if len(synced) > 0 {
+		s.logger.Info().Int("count", len(synced)).Msg("contacts captured from history sync")
+		s.webhook.Send("contacts.sync", s.Token, synced)
 	}
 }

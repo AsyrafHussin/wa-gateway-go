@@ -20,6 +20,7 @@ type Hub struct {
 	broadcast  chan []byte
 	register   chan *Client
 	unregister chan *Client
+	done       chan struct{}
 	logger     zerolog.Logger
 }
 
@@ -29,6 +30,7 @@ func NewHub(logger zerolog.Logger) *Hub {
 		broadcast:  make(chan []byte, 256),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
+		done:       make(chan struct{}),
 		logger:     logger,
 	}
 }
@@ -36,6 +38,15 @@ func NewHub(logger zerolog.Logger) *Hub {
 func (h *Hub) Run() {
 	for {
 		select {
+		case <-h.done:
+			h.mu.Lock()
+			for client := range h.clients {
+				close(client.send)
+				delete(h.clients, client)
+			}
+			h.mu.Unlock()
+			return
+
 		case client := <-h.register:
 			h.mu.Lock()
 			h.clients[client] = true
@@ -52,7 +63,7 @@ func (h *Hub) Run() {
 			h.logger.Debug().Msg("WebSocket client disconnected")
 
 		case message := <-h.broadcast:
-			h.mu.RLock()
+			h.mu.Lock()
 			for client := range h.clients {
 				select {
 				case client.send <- message:
@@ -61,9 +72,13 @@ func (h *Hub) Run() {
 					delete(h.clients, client)
 				}
 			}
-			h.mu.RUnlock()
+			h.mu.Unlock()
 		}
 	}
+}
+
+func (h *Hub) Shutdown() {
+	close(h.done)
 }
 
 func (h *Hub) Broadcast(token, event string, data interface{}) {
@@ -72,17 +87,7 @@ func (h *Hub) Broadcast(token, event string, data interface{}) {
 		Token: token,
 		Data:  data,
 	}
-	bytes, err := json.Marshal(msg)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("failed to marshal WebSocket message")
-		return
-	}
-
-	select {
-	case h.broadcast <- bytes:
-	default:
-		h.logger.Warn().Msg("WebSocket broadcast channel full, dropping message")
-	}
+	h.sendMessage(msg)
 }
 
 func (h *Hub) BroadcastWithMessage(token, event, message string) {
@@ -91,6 +96,10 @@ func (h *Hub) BroadcastWithMessage(token, event, message string) {
 		Token:   token,
 		Message: message,
 	}
+	h.sendMessage(msg)
+}
+
+func (h *Hub) sendMessage(msg Message) {
 	bytes, err := json.Marshal(msg)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to marshal WebSocket message")

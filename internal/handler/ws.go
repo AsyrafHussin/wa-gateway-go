@@ -8,16 +8,19 @@ import (
 )
 
 type WS struct {
-	hub *ws.Hub
+	hub     *ws.Hub
+	handler fiber.Handler
 }
 
 func NewWS(hub *ws.Hub) *WS {
-	return &WS{hub: hub}
+	h := &WS{hub: hub}
+	h.handler = websocket.New(h.handleConnection)
+	return h
 }
 
 func (h *WS) Upgrade(c *fiber.Ctx) error {
 	if websocket.IsWebSocketUpgrade(c) {
-		return websocket.New(h.handleConnection)(c)
+		return h.handler(c)
 	}
 	return fiber.ErrUpgradeRequired
 }

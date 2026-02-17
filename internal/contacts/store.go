@@ -78,6 +78,9 @@ func (s *Store) GetAll(limit, offset int) ([]Contact, int, error) {
 		}
 		contacts = append(contacts, c)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, err
+	}
 
 	return contacts, total, nil
 }

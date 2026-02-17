@@ -48,3 +48,14 @@ func (v *Validator) ValidateMessage(text string) error {
 	}
 	return nil
 }
+
+var tokenRegex = regexp.MustCompile(`^\d{7,15}$`)
+
+// ValidateToken ensures the token is a digits-only string (phone number format).
+// This prevents path traversal when the token is used in file paths.
+func ValidateToken(token string) error {
+	if !tokenRegex.MatchString(token) {
+		return fmt.Errorf("token must be 7-15 digits")
+	}
+	return nil
+}

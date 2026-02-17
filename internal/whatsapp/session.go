@@ -59,8 +59,12 @@ func NewDeviceSession(token string, cfg *config.Config, hub *ws.Hub, dispatcher 
 	// Ensure directories exist
 	sessionsDir := filepath.Join(cfg.DataDir, "sessions")
 	contactsDir := filepath.Join(cfg.DataDir, "contacts")
-	os.MkdirAll(sessionsDir, 0755)
-	os.MkdirAll(contactsDir, 0755)
+	if err := os.MkdirAll(sessionsDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create sessions directory: %w", err)
+	}
+	if err := os.MkdirAll(contactsDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create contacts directory: %w", err)
+	}
 
 	// Open contact store
 	contactStore, err := contacts.NewStore(filepath.Join(contactsDir, token+".db"))
@@ -175,7 +179,9 @@ func (s *DeviceSession) Disconnect(ctx context.Context) {
 
 func (s *DeviceSession) Logout(ctx context.Context) {
 	if s.Client != nil {
-		s.Client.Logout(ctx)
+		if err := s.Client.Logout(ctx); err != nil {
+			s.logger.Error().Err(err).Msg("failed to logout from WhatsApp")
+		}
 	}
 	s.Disconnect(ctx)
 

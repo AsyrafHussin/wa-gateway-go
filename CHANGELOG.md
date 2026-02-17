@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-02-17
+
+### Fixed
+
+- **Race condition in WebSocket hub** — broadcast now uses write lock when removing slow clients
+- **CSV injection** — contact CSV export uses `encoding/csv` writer instead of string concatenation
+- **Path traversal** — token parameters validated as digits-only (7-15 chars) across all endpoints
+- **Internal error exposure** — error responses no longer leak internal error messages to clients
+- **Context cancellation** — typing delay in message sender now respects context cancellation
+- **Resource leak on connect failure** — failed device connections are properly cleaned up from session map
+- **WebSocket handler allocation** — handler created once at init instead of per-request
+- **History sync webhook payload** — sends only newly discovered contacts instead of entire contact store
+- **Missing rows.Err() check** — contact store query now checks for iteration errors
+- **Directory creation errors** — session/contact directory creation failures are now surfaced
+- **Logout error handling** — WhatsApp logout errors are now logged instead of silently discarded
+- **Negative pagination** — contact list endpoint rejects negative limit/offset values
+- **Hub shutdown** — WebSocket hub now has proper shutdown mechanism, wired into graceful shutdown
+
+### Changed
+
+- Deduplicated WebSocket broadcast methods into shared internal helper
+- Added `INVALID_TOKEN` error code to API documentation
+
 ## [0.1.0] - 2026-02-17
 
 ### Added
@@ -40,4 +63,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `connection-success` — Device paired and connected
 - `connection-error` — Connection failed or lost
 
+[0.1.1]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/AsyrafHussin/wa-gateway-go/releases/tag/v0.1.0

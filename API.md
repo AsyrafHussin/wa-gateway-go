@@ -85,6 +85,7 @@ All responses follow a consistent JSON envelope format.
 | `RATE_LIMITED` | 429 | Too many requests |
 | `INVALID_REQUEST` | 400 | Malformed request body |
 | `MISSING_TOKEN` | 400 | Token (phone number) not provided |
+| `INVALID_TOKEN` | 400 | Token must be a phone number (7-15 digits) |
 | `INVALID_METHOD` | 400 | Connection method must be `qr` or `code` |
 | `INVALID_PHONE` | 400 | Phone number failed validation |
 | `INVALID_MESSAGE` | 400 | Message text is empty |
@@ -604,7 +605,7 @@ New contact captured from an incoming message.
 
 #### `contacts.sync`
 
-Batch of contacts discovered from WhatsApp history sync (happens on first connect).
+Batch of contacts discovered from WhatsApp history sync (happens on first connect). Only the newly discovered contacts from this sync batch are included, not the entire contact store.
 
 ```json
 {
@@ -613,10 +614,7 @@ Batch of contacts discovered from WhatsApp history sync (happens on first connec
   "data": [
     {
       "phone": "60198765432",
-      "name": "Ali",
-      "source": "history",
-      "firstSeen": "2026-02-17T08:00:00Z",
-      "lastSeen": "2026-02-17T08:00:00Z"
+      "name": "Ali"
     }
   ],
   "timestamp": "2026-02-17T10:30:00Z"

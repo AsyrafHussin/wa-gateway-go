@@ -59,7 +59,15 @@ func (m *DeviceManager) Connect(ctx context.Context, token string, method string
 	m.sessions[token] = session
 	m.mu.Unlock()
 
-	return session.Connect(ctx, method)
+	if err := session.Connect(ctx, method); err != nil {
+		// Connect failed — remove session from map and clean up resources
+		m.mu.Lock()
+		delete(m.sessions, token)
+		m.mu.Unlock()
+		session.Disconnect(ctx)
+		return err
+	}
+	return nil
 }
 
 func (m *DeviceManager) Disconnect(ctx context.Context, token string) error {

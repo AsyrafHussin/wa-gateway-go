@@ -35,18 +35,23 @@ func (h *Message) Send(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "MISSING_TOKEN", "Token is required")
 	}
 
+	if err := validator.ValidateToken(req.Token); err != nil {
+		return response.Error(c, fiber.StatusBadRequest, "INVALID_TOKEN", "Token must be a phone number (7-15 digits)")
+	}
+
 	if err := h.validator.ValidateMessage(req.Text); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "INVALID_MESSAGE", err.Error())
+		return response.Error(c, fiber.StatusBadRequest, "INVALID_MESSAGE", "Message text cannot be empty")
 	}
 
 	phone, err := h.validator.ValidatePhone(req.To)
 	if err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "INVALID_PHONE", err.Error())
+		return response.Error(c, fiber.StatusBadRequest, "INVALID_PHONE", "Invalid phone number")
 	}
 
 	result, err := h.manager.SendText(c.Context(), req.Token, phone, req.Text)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "SEND_FAILED", err.Error())
+		h.logger.Error().Err(err).Str("token", req.Token).Str("to", phone).Msg("failed to send message")
+		return response.Error(c, fiber.StatusInternalServerError, "SEND_FAILED", "Failed to send message")
 	}
 
 	return response.Success(c, fiber.StatusOK, fiber.Map{

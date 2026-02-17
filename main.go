@@ -74,6 +74,7 @@ func main() {
 	defer cancel()
 
 	manager.ShutdownAll(shutdownCtx)
+	hub.Shutdown()
 	srv.App.Shutdown()
 
 	logger.Info().Msg("goodbye")

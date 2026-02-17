@@ -36,9 +36,13 @@ func (h *Validation) ValidatePhone(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "MISSING_TOKEN", "Token is required")
 	}
 
+	if err := validator.ValidateToken(req.Token); err != nil {
+		return response.Error(c, fiber.StatusBadRequest, "INVALID_TOKEN", "Token must be a phone number (7-15 digits)")
+	}
+
 	phone, err := h.validator.ValidatePhone(req.Phone)
 	if err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "INVALID_PHONE", err.Error())
+		return response.Error(c, fiber.StatusBadRequest, "INVALID_PHONE", "Invalid phone number")
 	}
 
 	// Check cache first
@@ -53,7 +57,8 @@ func (h *Validation) ValidatePhone(c *fiber.Ctx) error {
 
 	results, err := h.manager.ValidatePhone(c.Context(), req.Token, phone)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "VALIDATION_FAILED", err.Error())
+		h.logger.Error().Err(err).Str("token", req.Token).Str("phone", phone).Msg("phone validation failed")
+		return response.Error(c, fiber.StatusInternalServerError, "VALIDATION_FAILED", "Phone validation failed")
 	}
 
 	if len(results) == 0 {
