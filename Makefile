@@ -1,7 +1,7 @@
 BINARY_NAME=wa-gateway-go
 BUILD_DIR=.
 
-.PHONY: build build-linux run dev clean tidy fmt lint
+.PHONY: build build-linux run dev clean tidy fmt lint docker docker-down docker-logs setup
 
 build:
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) .
@@ -27,3 +27,15 @@ fmt:
 
 lint:
 	golangci-lint run ./...
+
+setup:
+	@sh setup.sh
+
+docker:
+	docker compose up -d --build
+
+docker-down:
+	docker compose down
+
+docker-logs:
+	docker compose logs -f

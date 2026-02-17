@@ -1,0 +1,12 @@
+services:
+  wa-gateway:
+    build: .
+    ports:
+      - "${PORT:-4010}:${PORT:-4010}"
+    env_file: .env
+    volumes:
+      - wa-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  wa-data:

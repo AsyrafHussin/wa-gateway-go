@@ -35,8 +35,8 @@ go build -o wa-gateway-go .
 ### Configure
 
 ```bash
-cp .env.example .env
-# Edit .env and set your API_KEY
+make setup
+# Choose: 1) auto-generate  2) enter values manually
 ```
 
 ### Run
@@ -226,7 +226,57 @@ wa-gateway-go/
 
 ## Deployment
 
-### Systemd Service
+### Option 1: Docker Compose (Recommended)
+
+```bash
+make setup   # auto-generate .env or enter values manually
+make docker
+```
+
+Manage with `make docker-logs` and `make docker-down`. Data persists in a named volume.
+
+### Option 2: Docker
+
+```bash
+docker build -t wa-gateway-go .
+docker run -d \
+  --name wa-gateway \
+  --env-file .env \
+  -p 4010:4010 \
+  -v wa-data:/app/data \
+  --restart unless-stopped \
+  wa-gateway-go
+```
+
+### Option 3: Pre-built Binary
+
+Download from [Releases](https://github.com/AsyrafHussin/wa-gateway-go/releases), then:
+
+```bash
+mkdir -p /opt/wa-gateway-go
+cp wa-gateway-go .env /opt/wa-gateway-go/
+chmod +x /opt/wa-gateway-go/wa-gateway-go
+
+# Install systemd service (see template below)
+sudo systemctl enable wa-gateway-go
+sudo systemctl start wa-gateway-go
+```
+
+### Option 4: Build from Source
+
+```bash
+git clone https://github.com/AsyrafHussin/wa-gateway-go.git
+cd wa-gateway-go
+make build-linux
+
+scp wa-gateway-go .env user@server:/opt/wa-gateway-go/
+
+# On server: install systemd service (see template below)
+sudo systemctl enable wa-gateway-go
+sudo systemctl start wa-gateway-go
+```
+
+### Systemd Service Template
 
 ```ini
 [Unit]
@@ -246,20 +296,6 @@ EnvironmentFile=/opt/wa-gateway-go/.env
 WantedBy=multi-user.target
 ```
 
-### Deploy Steps
-
-```bash
-# Build for Linux
-make build-linux
-
-# Copy to server
-scp wa-gateway-go .env user@server:/opt/wa-gateway-go/
-
-# On server
-sudo systemctl enable wa-gateway-go
-sudo systemctl start wa-gateway-go
-```
-
 ## Roadmap
 
 - [ ] Media messages (image, video, audio, document)
@@ -270,7 +306,6 @@ sudo systemctl start wa-gateway-go
 - [ ] Newsletter/Channel support
 - [ ] Presence tracking (online/offline)
 - [ ] Auto-reject calls
-- [ ] Docker image
 
 ## License
 
