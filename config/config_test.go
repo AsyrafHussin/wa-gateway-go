@@ -16,7 +16,7 @@ func clearConfigEnv() {
 		"WS_ALLOWED_ORIGINS", "WS_AUTH_TIMEOUT",
 	}
 	for _, v := range envVars {
-		os.Unsetenv(v)
+		_ = os.Unsetenv(v)
 	}
 }
 
@@ -34,8 +34,7 @@ func TestLoad_RequiresAPIKey(t *testing.T) {
 
 func TestLoad_Defaults(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key-123")
-	defer os.Unsetenv("API_KEY")
+	t.Setenv("API_KEY", "test-key-123")
 
 	cfg, err := Load()
 	if err != nil {
@@ -106,28 +105,26 @@ func TestLoad_Defaults(t *testing.T) {
 
 func TestLoad_CustomValues(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "my-secret-key")
-	os.Setenv("PORT", "8080")
-	os.Setenv("HOST", "127.0.0.1")
-	os.Setenv("LOG_LEVEL", "debug")
-	os.Setenv("CORS_ORIGINS", "http://localhost:3000")
-	os.Setenv("PHONE_COUNTRY_CODE", "65")
-	os.Setenv("PHONE_MIN_LENGTH", "10")
-	os.Setenv("PHONE_MAX_LENGTH", "10")
-	os.Setenv("DATA_DIR", "/tmp/wa-data")
-	os.Setenv("TYPING_DELAY_MS", "500")
-	os.Setenv("AUTO_READ_RECEIPT", "true")
-	os.Setenv("WEBHOOK_URL", "https://example.com/webhook")
-	os.Setenv("WEBHOOK_SECRET", "webhook-secret")
-	os.Setenv("WEBHOOK_TIMEOUT_MS", "10000")
-	os.Setenv("RATE_LIMIT_DEVICES", "5")
-	os.Setenv("RATE_LIMIT_MESSAGES", "60")
-	os.Setenv("RATE_LIMIT_VALIDATE", "120")
-	os.Setenv("CACHE_TTL_SECONDS", "7200")
-	os.Setenv("WS_ALLOWED_ORIGINS", "http://localhost:3000,https://app.example.com")
-	os.Setenv("WS_AUTH_TIMEOUT", "10")
-
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "my-secret-key")
+	t.Setenv("PORT", "8080")
+	t.Setenv("HOST", "127.0.0.1")
+	t.Setenv("LOG_LEVEL", "debug")
+	t.Setenv("CORS_ORIGINS", "http://localhost:3000")
+	t.Setenv("PHONE_COUNTRY_CODE", "65")
+	t.Setenv("PHONE_MIN_LENGTH", "10")
+	t.Setenv("PHONE_MAX_LENGTH", "10")
+	t.Setenv("DATA_DIR", "/tmp/wa-data")
+	t.Setenv("TYPING_DELAY_MS", "500")
+	t.Setenv("AUTO_READ_RECEIPT", "true")
+	t.Setenv("WEBHOOK_URL", "https://example.com/webhook")
+	t.Setenv("WEBHOOK_SECRET", "webhook-secret")
+	t.Setenv("WEBHOOK_TIMEOUT_MS", "10000")
+	t.Setenv("RATE_LIMIT_DEVICES", "5")
+	t.Setenv("RATE_LIMIT_MESSAGES", "60")
+	t.Setenv("RATE_LIMIT_VALIDATE", "120")
+	t.Setenv("CACHE_TTL_SECONDS", "7200")
+	t.Setenv("WS_ALLOWED_ORIGINS", "http://localhost:3000,https://app.example.com")
+	t.Setenv("WS_AUTH_TIMEOUT", "10")
 
 	cfg, err := Load()
 	if err != nil {
@@ -195,9 +192,8 @@ func TestLoad_CustomValues(t *testing.T) {
 
 func TestLoad_InvalidPort(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("PORT", "99999")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("PORT", "99999")
 
 	_, err := Load()
 	if err == nil {
@@ -207,9 +203,8 @@ func TestLoad_InvalidPort(t *testing.T) {
 
 func TestLoad_ZeroPort(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("PORT", "0")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("PORT", "0")
 
 	_, err := Load()
 	if err == nil {
@@ -219,9 +214,8 @@ func TestLoad_ZeroPort(t *testing.T) {
 
 func TestLoad_NegativePort(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("PORT", "-1")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("PORT", "-1")
 
 	// Negative port: Atoi returns -1, which fails validation
 	_, err := Load()
@@ -232,9 +226,8 @@ func TestLoad_NegativePort(t *testing.T) {
 
 func TestLoad_WSAuthTimeoutZero(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("WS_AUTH_TIMEOUT", "0")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("WS_AUTH_TIMEOUT", "0")
 
 	_, err := Load()
 	if err == nil {
@@ -244,9 +237,8 @@ func TestLoad_WSAuthTimeoutZero(t *testing.T) {
 
 func TestLoad_WSAuthTimeoutTooHigh(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("WS_AUTH_TIMEOUT", "61")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("WS_AUTH_TIMEOUT", "61")
 
 	_, err := Load()
 	if err == nil {
@@ -256,9 +248,8 @@ func TestLoad_WSAuthTimeoutTooHigh(t *testing.T) {
 
 func TestLoad_NonNumericPort(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("PORT", "abc")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("PORT", "abc")
 
 	// Non-numeric port falls back to default 4010, which is valid
 	cfg, err := Load()
@@ -272,9 +263,8 @@ func TestLoad_NonNumericPort(t *testing.T) {
 
 func TestLoad_NonNumericBool(t *testing.T) {
 	clearConfigEnv()
-	os.Setenv("API_KEY", "test-key")
-	os.Setenv("AUTO_READ_RECEIPT", "not-a-bool")
-	defer clearConfigEnv()
+	t.Setenv("API_KEY", "test-key")
+	t.Setenv("AUTO_READ_RECEIPT", "not-a-bool")
 
 	cfg, err := Load()
 	if err != nil {
@@ -287,8 +277,7 @@ func TestLoad_NonNumericBool(t *testing.T) {
 }
 
 func TestGetEnv(t *testing.T) {
-	os.Setenv("TEST_GET_ENV_KEY", "value123")
-	defer os.Unsetenv("TEST_GET_ENV_KEY")
+	t.Setenv("TEST_GET_ENV_KEY", "value123")
 
 	if got := getEnv("TEST_GET_ENV_KEY", "fallback"); got != "value123" {
 		t.Errorf("expected 'value123', got %q", got)
@@ -299,8 +288,7 @@ func TestGetEnv(t *testing.T) {
 }
 
 func TestGetEnvInt(t *testing.T) {
-	os.Setenv("TEST_INT_KEY", "42")
-	defer os.Unsetenv("TEST_INT_KEY")
+	t.Setenv("TEST_INT_KEY", "42")
 
 	if got := getEnvInt("TEST_INT_KEY", 0); got != 42 {
 		t.Errorf("expected 42, got %d", got)
@@ -309,8 +297,7 @@ func TestGetEnvInt(t *testing.T) {
 		t.Errorf("expected fallback 99, got %d", got)
 	}
 
-	os.Setenv("TEST_INT_INVALID", "not-a-number")
-	defer os.Unsetenv("TEST_INT_INVALID")
+	t.Setenv("TEST_INT_INVALID", "not-a-number")
 
 	if got := getEnvInt("TEST_INT_INVALID", 77); got != 77 {
 		t.Errorf("expected fallback 77, got %d", got)
@@ -331,13 +318,13 @@ func TestGetEnvBool(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		os.Setenv("TEST_BOOL_KEY", tt.value)
+		t.Setenv("TEST_BOOL_KEY", tt.value)
 		got := getEnvBool("TEST_BOOL_KEY", !tt.expected)
 		if got != tt.expected {
 			t.Errorf("getEnvBool(%q) = %v, expected %v", tt.value, got, tt.expected)
 		}
 	}
-	os.Unsetenv("TEST_BOOL_KEY")
+	_ = os.Unsetenv("TEST_BOOL_KEY")
 
 	// Missing key should return fallback
 	if got := getEnvBool("TEST_BOOL_MISSING", true); got != true {

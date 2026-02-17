@@ -12,9 +12,9 @@ func TestClient_Auth_TimingAttack(t *testing.T) {
 
 	keys := []string{
 		"wrong",
-		"correct-api-key-1234",  // one char short
+		"correct-api-key-1234",   // one char short
 		"correct-api-key-123456", // one char long
-		"CORRECT-API-KEY-12345", // different case
+		"CORRECT-API-KEY-12345",  // different case
 		"x",
 		strings.Repeat("a", 1000), // very long
 	}

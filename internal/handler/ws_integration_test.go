@@ -40,7 +40,7 @@ func startTestApp(t *testing.T, apiKey string, authTimeout time.Duration, allowe
 		t.Fatalf("failed to get free port: %v", err)
 	}
 	port := ln.Addr().(*net.TCPAddr).Port
-	ln.Close()
+	_ = ln.Close()
 
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
 	go func() {
@@ -51,7 +51,7 @@ func startTestApp(t *testing.T, apiKey string, authTimeout time.Duration, allowe
 	for i := 0; i < 50; i++ {
 		conn, err := net.Dial("tcp", addr)
 		if err == nil {
-			conn.Close()
+			_ = conn.Close()
 			break
 		}
 		time.Sleep(20 * time.Millisecond)
@@ -72,7 +72,7 @@ func TestIntegration_AuthValid(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	// Send auth
 	auth := map[string]string{"type": "auth", "apiKey": "test-api-key"}
@@ -101,7 +101,7 @@ func TestIntegration_AuthInvalidKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	auth := map[string]string{"type": "auth", "apiKey": "wrong-key"}
 	if err := conn.WriteJSON(auth); err != nil {
@@ -128,7 +128,7 @@ func TestIntegration_AuthMalformedJSON(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	if err := conn.WriteMessage(fws.TextMessage, []byte("not json")); err != nil {
 		t.Fatalf("write failed: %v", err)
@@ -154,7 +154,7 @@ func TestIntegration_AuthWrongType(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	msg := map[string]string{"type": "subscribe", "apiKey": "test-api-key"}
 	if err := conn.WriteJSON(msg); err != nil {
@@ -181,7 +181,7 @@ func TestIntegration_AuthEmptyKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	msg := map[string]string{"type": "auth", "apiKey": ""}
 	if err := conn.WriteJSON(msg); err != nil {
@@ -208,10 +208,10 @@ func TestIntegration_AuthTimeout(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	// Don't send auth, wait for timeout
-	conn.SetReadDeadline(time.Now().Add(3 * time.Second))
+	_ = conn.SetReadDeadline(time.Now().Add(3 * time.Second))
 
 	var resp authResponse
 	if err := conn.ReadJSON(&resp); err != nil {
@@ -233,7 +233,7 @@ func TestIntegration_BroadcastAfterAuth(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	// Auth
 	auth := map[string]string{"type": "auth", "apiKey": "test-api-key"}
@@ -256,7 +256,7 @@ func TestIntegration_BroadcastAfterAuth(t *testing.T) {
 	hub.Broadcast("60123456789", "qrcode", "test-qr-data")
 
 	// Read broadcast
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 	_, msg, err := conn.ReadMessage()
 	if err != nil {
 		t.Fatalf("read broadcast failed: %v", err)
@@ -297,5 +297,5 @@ func TestIntegration_OriginAllowed(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v", err)
 	}
-	conn.Close()
+	_ = conn.Close()
 }
