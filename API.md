@@ -2,6 +2,47 @@
 
 Base URL: `http://localhost:4010`
 
+## Table of Contents
+
+- [Response Format](#response-format)
+  - [Success](#success)
+  - [Error](#error)
+  - [Error Codes](#error-codes)
+- [Endpoints](#endpoints)
+  - [Health Check](#health-check)
+    - [`GET /health`](#get-health)
+    - [`GET /health/detailed`](#get-healthdetailed)
+  - [Devices](#devices)
+    - [`POST /devices`](#post-devices)
+    - [`DELETE /devices/:token`](#delete-devicestoken)
+  - [Messages](#messages)
+    - [`POST /messages`](#post-messages)
+  - [Phone Validation](#phone-validation)
+    - [`POST /validate/phone`](#post-validatephone)
+  - [Contacts](#contacts)
+    - [`GET /contacts/:token`](#get-contactstoken)
+  - [Cache](#cache)
+    - [`DELETE /cache`](#delete-cache)
+- [WebSocket](#websocket)
+  - [Events](#events)
+    - [`qrcode`](#qrcode)
+    - [`pairing-code`](#pairing-code)
+    - [`connection-success`](#connection-success)
+    - [`connection-error`](#connection-error)
+- [Webhooks](#webhooks)
+  - [Configuration](#configuration)
+  - [Request Format](#request-format)
+  - [Signature Verification](#signature-verification)
+  - [Webhook Events](#webhook-events)
+    - [`device.connected`](#deviceconnected)
+    - [`device.disconnected`](#devicedisconnected)
+    - [`device.logged_out`](#devicelogged_out)
+    - [`message.receipt`](#messagereceipt)
+    - [`contacts.new`](#contactsnew)
+    - [`contacts.sync`](#contactssync)
+
+---
+
 All responses follow a consistent JSON envelope format.
 
 ## Response Format
@@ -488,7 +529,7 @@ expected := hex.EncodeToString(mac.Sum(nil))
 valid := hmac.Equal([]byte(expected), []byte(signature))
 ```
 
-### Events
+### Webhook Events
 
 #### `device.connected`
 
