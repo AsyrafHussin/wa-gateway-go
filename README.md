@@ -299,11 +299,42 @@ WantedBy=multi-user.target
 ## Roadmap
 
 ### Messaging
+- [x] Send text messages
+- [x] Typing delay simulation
+- [x] Phone number validation with caching
 - [ ] Media messages (image, video, audio, document)
 - [ ] Reply/quote a message
 - [ ] Reactions (send/receive)
 - [ ] Message edit and delete
 - [ ] Broadcast with configurable delay
+
+### Device Management
+- [x] Multi-device support
+- [x] QR code and pairing code login
+- [x] Auto-reconnect on restart
+- [x] Graceful shutdown
+
+### Contacts
+- [x] Auto-capture from incoming messages
+- [x] History sync on first connect
+- [x] Contact list and CSV export
+
+### Real-time Events
+- [x] WebSocket with origin whitelist and first-message auth
+- [x] Webhooks with HMAC-SHA256 signing
+- [x] Device and message receipt events
+
+### Security
+- [x] API key auth (Bearer + X-API-Key)
+- [x] Per-endpoint rate limiting
+- [x] WebSocket origin whitelist
+- [x] Constant-time key comparison
+
+### Deployment
+- [x] Single binary (pure Go, no CGo)
+- [x] Docker and Docker Compose
+- [x] Interactive env setup (`make setup`)
+- [x] CI/CD with auto-release binaries
 
 ### Groups
 - [ ] Send message to group
