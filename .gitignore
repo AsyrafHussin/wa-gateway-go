@@ -21,3 +21,6 @@ Thumbs.db
 
 # Go
 vendor/
+
+# Memory (Claude Code session state)
+memory/
