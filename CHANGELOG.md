@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-02-17
+
+### Added
+
+- **Docker support** — multi-stage Dockerfile (golang:1.25-alpine → alpine:3.21) with non-root user, ~15MB image
+- **docker-compose.yml** — single service with named volume for persistent WhatsApp session data
+- **setup.sh** — interactive `.env` setup: auto-generate (random API_KEY + defaults) or manual entry
+- **Makefile targets** — `make setup`, `make docker`, `make docker-down`, `make docker-logs`
+- **.dockerignore** — excludes .git, data/, binaries, .env, docs, IDE files
+
+### Changed
+
+- README Deployment section expanded with 4 copy-paste-ready options: Docker Compose, Docker, pre-built binary, build from source
+
 ## [0.1.4] - 2026-02-17
 
 ### Added
@@ -116,6 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `connection-success` — Device paired and connected
 - `connection-error` — Connection failed or lost
 
+[0.1.5]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.1...v0.1.2
