@@ -82,7 +82,7 @@ func (d *Dispatcher) dispatch(event, token string, data interface{}) {
 		d.logger.Error().Err(err).Str("event", event).Msg("webhook request failed")
 		return
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode >= 400 {
 		d.logger.Warn().Int("status", resp.StatusCode).Str("event", event).Msg("webhook returned error status")

@@ -172,7 +172,7 @@ func (s *DeviceSession) Disconnect(ctx context.Context) {
 		s.Client.Disconnect()
 	}
 	if s.Contacts != nil {
-		s.Contacts.Close()
+		_ = s.Contacts.Close()
 	}
 	s.setStatus(StatusDisconnected)
 }
@@ -185,11 +185,11 @@ func (s *DeviceSession) Logout(ctx context.Context) {
 	}
 	s.Disconnect(ctx)
 
-	// Remove session DB
+	// Remove session DB (best-effort cleanup, files may not exist)
 	dbPath := filepath.Join(s.config.DataDir, "sessions", s.Token+".db")
-	os.Remove(dbPath)
-	os.Remove(dbPath + "-wal")
-	os.Remove(dbPath + "-shm")
+	_ = os.Remove(dbPath)
+	_ = os.Remove(dbPath + "-wal")
+	_ = os.Remove(dbPath + "-shm")
 }
 
 func (s *DeviceSession) GetStatus() SessionStatus {

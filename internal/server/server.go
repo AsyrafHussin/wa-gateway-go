@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/rs/zerolog"
 
 	"github.com/AsyrafHussin/wa-gateway-go/config"
 	"github.com/AsyrafHussin/wa-gateway-go/internal/cache"
@@ -13,7 +14,6 @@ import (
 	"github.com/AsyrafHussin/wa-gateway-go/internal/whatsapp"
 	"github.com/AsyrafHussin/wa-gateway-go/internal/ws"
 	"github.com/AsyrafHussin/wa-gateway-go/pkg/validator"
-	"github.com/rs/zerolog"
 )
 
 type Server struct {

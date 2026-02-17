@@ -15,7 +15,9 @@ func (s *DeviceSession) handleEvent(evt interface{}) {
 		s.logger.Info().Msg("connected to WhatsApp")
 		s.hub.Broadcast(s.Token, "connection-success", nil)
 		s.webhook.Send("device.connected", s.Token, nil)
-		s.Client.SendPresence(context.Background(), types.PresenceAvailable)
+		if err := s.Client.SendPresence(context.Background(), types.PresenceAvailable); err != nil {
+			s.logger.Error().Err(err).Msg("failed to send presence")
+		}
 
 	case *events.Disconnected:
 		s.setStatus(StatusDisconnected)
@@ -55,7 +57,7 @@ func (s *DeviceSession) handleEvent(evt interface{}) {
 		s.hub.BroadcastWithMessage(s.Token, "connection-error", "Connection failed: "+v.Reason.String())
 
 	case *events.TemporaryBan:
-		s.logger.Error().Str("code", string(v.Code)).Msg("temporary ban")
+		s.logger.Error().Int("code", int(v.Code)).Msg("temporary ban")
 
 	case *events.PairSuccess:
 		s.logger.Info().Msg("pairing successful")

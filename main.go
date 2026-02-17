@@ -75,7 +75,9 @@ func main() {
 
 	manager.ShutdownAll(shutdownCtx)
 	hub.Shutdown()
-	srv.App.Shutdown()
+	if err := srv.App.Shutdown(); err != nil {
+		logger.Error().Err(err).Msg("server shutdown error")
+	}
 
 	logger.Info().Msg("goodbye")
 }

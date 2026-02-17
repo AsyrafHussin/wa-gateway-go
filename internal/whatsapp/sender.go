@@ -24,7 +24,7 @@ func (s *DeviceSession) SendText(ctx context.Context, to, text string) (*SendRes
 	jid := types.NewJID(to, types.DefaultUserServer)
 
 	// Typing indicator
-	s.Client.SendChatPresence(ctx, jid, types.ChatPresenceComposing, types.ChatPresenceMediaText)
+	_ = s.Client.SendChatPresence(ctx, jid, types.ChatPresenceComposing, types.ChatPresenceMediaText)
 
 	// Simulate typing delay (respects context cancellation)
 	delay := time.Duration(s.config.TypingDelay) * time.Millisecond
@@ -35,7 +35,7 @@ func (s *DeviceSession) SendText(ctx context.Context, to, text string) (*SendRes
 	}
 
 	// Stop typing
-	s.Client.SendChatPresence(ctx, jid, types.ChatPresencePaused, types.ChatPresenceMediaText)
+	_ = s.Client.SendChatPresence(ctx, jid, types.ChatPresencePaused, types.ChatPresenceMediaText)
 
 	// Send message
 	resp, err := s.Client.SendMessage(ctx, jid, &waE2E.Message{

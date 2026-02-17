@@ -54,9 +54,9 @@ func (h *Contact) List(c *fiber.Ctx) error {
 		var buf bytes.Buffer
 		w := csv.NewWriter(&buf)
 
-		w.Write([]string{"phone", "name", "source", "first_seen", "last_seen"})
+		_ = w.Write([]string{"phone", "name", "source", "first_seen", "last_seen"})
 		for _, contact := range contacts {
-			w.Write([]string{
+			_ = w.Write([]string{
 				contact.Phone,
 				contact.Name,
 				contact.Source,

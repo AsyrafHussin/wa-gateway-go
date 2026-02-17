@@ -35,7 +35,7 @@ func NewStore(dbPath string) (*Store, error) {
 		)
 	`)
 	if err != nil {
-		db.Close()
+		_ = db.Close()
 		return nil, err
 	}
 
@@ -68,7 +68,7 @@ func (s *Store) GetAll(limit, offset int) ([]Contact, int, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var contacts []Contact
 	for rows.Next() {

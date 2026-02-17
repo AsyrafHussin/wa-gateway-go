@@ -1,7 +1,7 @@
 BINARY_NAME=wa-gateway-go
 BUILD_DIR=.
 
-.PHONY: build build-linux run dev clean tidy
+.PHONY: build build-linux run dev clean tidy fmt lint
 
 build:
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) .
@@ -21,3 +21,9 @@ clean:
 
 tidy:
 	go mod tidy
+
+fmt:
+	goimports -w .
+
+lint:
+	golangci-lint run ./...
