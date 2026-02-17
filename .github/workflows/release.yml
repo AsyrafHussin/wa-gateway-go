@@ -47,12 +47,22 @@ jobs:
           GOARCH: arm64
         run: go build -ldflags="-s -w" -o wa-gateway-go-darwin-arm64 .
 
+      - name: Extract changelog
+        id: changelog
+        run: |
+          # Extract section for current tag (e.g. v0.1.4 → 0.1.4)
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Get content between this version's header and the next version header
+          NOTES=$(awk "/^## \[${VERSION}\]/{found=1; next} /^## \[/{if(found) exit} found{print}" CHANGELOG.md)
+          # Write to file to preserve formatting
+          echo "$NOTES" > release_notes.md
+
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release_notes.md
           files: |
             wa-gateway-go-linux-amd64
             wa-gateway-go-linux-arm64
             wa-gateway-go-darwin-amd64
             wa-gateway-go-darwin-arm64
-          generate_release_notes: false
