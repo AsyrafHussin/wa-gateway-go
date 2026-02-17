@@ -1,7 +1,7 @@
 # Session: 2026-02-17
 
 ## Completed Tasks
-- Initial implementation of wa-gateway-go (all 7 phases)
+- Initial implementation of wa-gateway-go (all 7 phases) — 39e09b8
   - Phase 1: Scaffolding (go.mod, config, helpers, Makefile)
   - Phase 2: HTTP server + Fiber middleware (auth, rate limit, logger)
   - Phase 3: WebSocket hub (native WS, replacing Socket.IO)
@@ -9,6 +9,7 @@
   - Phase 5: API handlers (device, message, validation, contact, cache) + webhook dispatcher
   - Phase 6: main.go wiring, graceful shutdown, auto-reconnect
   - Phase 7: AIM frontend Show.jsx updated to native WebSocket + REST
+- Added documentation: README.md, API.md, CHANGELOG.md, LICENSE (MIT)
 
 ## Decisions
 - Used `modernc.org/sqlite` (pure Go) instead of CGo sqlite3 for easy cross-compilation
