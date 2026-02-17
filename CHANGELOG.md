@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-02-17
+
+### Added
+
+- **CI workflow** — lint, build, and test on every push/PR to main
+- **Release workflow** — auto-build binaries (Linux amd64/arm64, macOS amd64/arm64) and attach to GitHub releases on tag push
+- CI/CD status badges in README
+- Pre-built binary download link in Quick Start
+
 ## [0.1.2] - 2026-02-17
 
 ### Added
@@ -78,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `connection-success` — Device paired and connected
 - `connection-error` — Connection failed or lost
 
+[0.1.3]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/AsyrafHussin/wa-gateway-go/releases/tag/v0.1.0

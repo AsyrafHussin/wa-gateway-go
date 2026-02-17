@@ -1,5 +1,8 @@
 # wa-gateway-go
 
+[![CI](https://github.com/AsyrafHussin/wa-gateway-go/actions/workflows/ci.yml/badge.svg)](https://github.com/AsyrafHussin/wa-gateway-go/actions/workflows/ci.yml)
+[![Release](https://github.com/AsyrafHussin/wa-gateway-go/actions/workflows/release.yml/badge.svg)](https://github.com/AsyrafHussin/wa-gateway-go/actions/workflows/release.yml)
+
 A lightweight, self-hosted WhatsApp gateway built with Go. Single binary, no dependencies, low memory footprint.
 
 Connect WhatsApp devices via QR code or pairing code, send messages, validate phone numbers, and capture contacts — all through a simple REST API with real-time WebSocket events.
@@ -19,6 +22,8 @@ Connect WhatsApp devices via QR code or pairing code, send messages, validate ph
 ## Quick Start
 
 ### Download
+
+Grab a pre-built binary from [Releases](https://github.com/AsyrafHussin/wa-gateway-go/releases), or build from source:
 
 ```bash
 # Clone and build

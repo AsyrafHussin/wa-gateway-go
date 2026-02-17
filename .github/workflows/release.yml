@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build Linux amd64
+        env:
+          CGO_ENABLED: "0"
+          GOOS: linux
+          GOARCH: amd64
+        run: go build -ldflags="-s -w" -o wa-gateway-go-linux-amd64 .
+
+      - name: Build Linux arm64
+        env:
+          CGO_ENABLED: "0"
+          GOOS: linux
+          GOARCH: arm64
+        run: go build -ldflags="-s -w" -o wa-gateway-go-linux-arm64 .
+
+      - name: Build macOS amd64
+        env:
+          CGO_ENABLED: "0"
+          GOOS: darwin
+          GOARCH: amd64
+        run: go build -ldflags="-s -w" -o wa-gateway-go-darwin-amd64 .
+
+      - name: Build macOS arm64
+        env:
+          CGO_ENABLED: "0"
+          GOOS: darwin
+          GOARCH: arm64
+        run: go build -ldflags="-s -w" -o wa-gateway-go-darwin-arm64 .
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            wa-gateway-go-linux-amd64
+            wa-gateway-go-linux-arm64
+            wa-gateway-go-darwin-amd64
+            wa-gateway-go-darwin-arm64
+          generate_release_notes: false
