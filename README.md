@@ -298,14 +298,30 @@ WantedBy=multi-user.target
 
 ## Roadmap
 
+### Messaging
 - [ ] Media messages (image, video, audio, document)
-- [ ] Group messaging
-- [ ] Reactions, replies, and read receipts
+- [ ] Reply/quote a message
+- [ ] Reactions (send/receive)
 - [ ] Message edit and delete
-- [ ] Polls
-- [ ] Newsletter/Channel support
-- [ ] Presence tracking (online/offline)
-- [ ] Auto-reject calls
+- [ ] Broadcast with configurable delay
+
+### Groups
+- [ ] Send message to group
+- [ ] Create/manage groups and participants
+
+### Auto-Reply & AI
+- [ ] Keyword-based auto-reply rules
+- [ ] AI auto-reply (OpenAI, Anthropic, Ollama)
+- [ ] Knowledge base (upload docs for AI context)
+
+### Web Dashboard
+- [ ] Built-in web UI (`ENABLE_UI=true`, embedded HTML/JS)
+- [ ] QR scanner, device status, send test message
+
+### Platform
+- [ ] Multi API key support (per-project isolation)
+- [ ] Incoming message webhooks (text, media)
+- [ ] Media download and storage
 
 ## License
 
