@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-02-17
+
+### Added
+
+- **golangci-lint config** — `.golangci.yml` with errcheck, govet, staticcheck, unused, ineffassign linters
+- **goimports formatter** — auto-groups imports into stdlib, third-party, and local sections
+- **`make fmt`** — format all Go files with goimports
+- **`make lint`** — run golangci-lint across the entire codebase
+
+### Fixed
+
+- 20 unchecked error returns (`errcheck`) across 11 files
+- Incorrect `int`-to-`string` conversion in TemporaryBan event logging (`govet`)
+- Import ordering to separate third-party from local imports
+
 ## [0.1.1] - 2026-02-17
 
 ### Fixed
@@ -63,5 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `connection-success` — Device paired and connected
 - `connection-error` — Connection failed or lost
 
+[0.1.2]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/AsyrafHussin/wa-gateway-go/releases/tag/v0.1.0

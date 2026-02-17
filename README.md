@@ -55,6 +55,18 @@ make build-linux
 make dev
 ```
 
+## Code Quality
+
+```bash
+# Format all files (goimports — like Prettier for Go)
+make fmt
+
+# Lint all files (golangci-lint — like ESLint for Go)
+make lint
+```
+
+The project uses [golangci-lint](https://golangci-lint.run/) with errcheck, govet, staticcheck, unused, and ineffassign linters. See `.golangci.yml` for configuration.
+
 ## Configuration
 
 All configuration is via environment variables or a `.env` file.
