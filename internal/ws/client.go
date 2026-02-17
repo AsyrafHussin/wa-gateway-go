@@ -39,16 +39,18 @@ type Client struct {
 	authOnce      sync.Once
 	apiKey        []byte
 	logger        zerolog.Logger
+	writeDone     chan struct{}
 }
 
 func NewClient(hub *Hub, conn *websocket.Conn, apiKey []byte, logger zerolog.Logger) *Client {
 	return &Client{
-		hub:      hub,
-		conn:     conn,
-		send:     make(chan []byte, 256),
-		authDone: make(chan struct{}),
-		apiKey:   apiKey,
-		logger:   logger,
+		hub:       hub,
+		conn:      conn,
+		send:      make(chan []byte, 256),
+		authDone:  make(chan struct{}),
+		apiKey:    apiKey,
+		logger:    logger,
+		writeDone: make(chan struct{}),
 	}
 }
 
@@ -85,6 +87,7 @@ func (c *Client) WritePump() {
 	defer func() {
 		ticker.Stop()
 		_ = c.conn.Close()
+		close(c.writeDone)
 	}()
 
 	for {
@@ -212,6 +215,10 @@ func (c *Client) sendAuthError(message string) {
 	}
 	// Give WritePump time to flush the error message
 	time.Sleep(100 * time.Millisecond)
+}
+
+func (c *Client) WaitWriteDone() {
+	<-c.writeDone
 }
 
 func (c *Client) remoteAddr() string {

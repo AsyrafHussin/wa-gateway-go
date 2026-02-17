@@ -88,4 +88,8 @@ func (h *WS) handleConnection(c *websocket.Conn) {
 	go client.AuthTimeoutPump(h.authTimeout)
 	go client.WritePump()
 	client.ReadPump()
+	// Wait for WritePump to exit before returning — fiber's releaseConn
+	// resets the *websocket.Conn when handleConnection returns, so WritePump
+	// must finish first to avoid a data race.
+	client.WaitWriteDone()
 }

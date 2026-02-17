@@ -18,12 +18,13 @@ func newTestHub() *Hub {
 // mockClient creates a client with only a send channel (no real websocket)
 func mockClient(hub *Hub) *Client {
 	c := &Client{
-		hub:      hub,
-		conn:     nil,
-		send:     make(chan []byte, 256),
-		authDone: make(chan struct{}),
-		apiKey:   []byte("test-key"),
-		logger:   testLogger,
+		hub:       hub,
+		conn:      nil,
+		send:      make(chan []byte, 256),
+		authDone:  make(chan struct{}),
+		apiKey:    []byte("test-key"),
+		logger:    testLogger,
+		writeDone: make(chan struct{}),
 	}
 	return c
 }
