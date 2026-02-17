@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-02-17
+
+### Added
+
+- **WebSocket origin whitelist** — `WS_ALLOWED_ORIGINS` env var blocks cross-site WebSocket hijacking (CSWSH) at HTTP upgrade time
+- **WebSocket first-message auth** — clients must send `{"type":"auth","apiKey":"..."}` within configurable timeout (`WS_AUTH_TIMEOUT`, default 5s)
+- **Broadcast filtering** — only authenticated WebSocket clients receive broadcast messages
+- **Security event logging** — auth failures, timeouts, and origin rejections logged with remote IP at Warn level
+- **Read size limit** — `conn.SetReadLimit(4096)` prevents OOM from oversized WebSocket messages
+- **Config validation** — `WS_AUTH_TIMEOUT` validated to 1-60 range
+- **56 new tests across 6 test files:**
+  - `config/config_test.go` (13 tests) — defaults, custom values, port/timeout validation, env helpers
+  - `internal/ws/hub_test.go` (15 tests) — register/unregister, broadcast to authenticated clients, data types, shutdown, skip unauthenticated, none authenticated
+  - `internal/ws/auth_test.go` (5 tests) — default auth state, auth flag, auth message/response structs, timeout cancellation
+  - `internal/ws/security_test.go` (4 tests) — constant-time comparison, null bytes, replay auth (sync.Once), oversized payload limit
+  - `internal/handler/ws_test.go` (10 tests) — origin allowed/rejected/wildcard/empty/multiple/case-insensitive, empty config defaults to wildcard, whitespace config defaults to wildcard, config parsing
+  - `internal/handler/ws_integration_test.go` (9 tests) — full WebSocket auth flow: valid key, invalid key, malformed JSON, wrong type, empty key, timeout, broadcast after auth, origin rejected, origin allowed
+
+### Fixed
+
+- **Auth timeout goroutine leak** — `authDone` channel now closed on all auth exit paths, `AuthTimeoutPump` exits immediately
+- **Auth timeout race** — `authDone` closed before setting `authenticated` flag, preventing post-auth disconnection
+
+### Security
+
+- Constant-time API key comparison (`crypto/subtle.ConstantTimeCompare`)
+- Null byte and oversized payload rejection
+- Empty/whitespace origin config safely defaults to wildcard
+
 ## [0.1.3] - 2026-02-17
 
 ### Added
@@ -87,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `connection-success` — Device paired and connected
 - `connection-error` — Connection failed or lost
 
+[0.1.4]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/AsyrafHussin/wa-gateway-go/compare/v0.1.0...v0.1.1

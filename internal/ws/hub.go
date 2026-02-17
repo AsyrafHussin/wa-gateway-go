@@ -65,6 +65,9 @@ func (h *Hub) Run() {
 		case message := <-h.broadcast:
 			h.mu.Lock()
 			for client := range h.clients {
+				if !client.IsAuthenticated() {
+					continue
+				}
 				select {
 				case client.send <- message:
 				default:

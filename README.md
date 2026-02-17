@@ -96,10 +96,14 @@ All configuration is via environment variables or a `.env` file.
 | `RATE_LIMIT_MESSAGES` | `30` | Message endpoints: requests per minute |
 | `RATE_LIMIT_VALIDATE` | `60` | Validation endpoints: requests per minute |
 | `CACHE_TTL_SECONDS` | `3600` | Phone validation cache TTL |
+| `WS_ALLOWED_ORIGINS` | `*` | Comma-separated allowed WebSocket origins |
+| `WS_AUTH_TIMEOUT` | `5` | Seconds to wait for WebSocket auth (1-60) |
 
 ## Authentication
 
-All API endpoints (except `/health` and `/ws`) require authentication via one of:
+All API endpoints (except `/health`) require authentication. REST endpoints use header-based auth, WebSocket uses first-message auth.
+
+**REST endpoints** — authenticate via one of:
 
 ```
 Authorization: Bearer YOUR_API_KEY
@@ -125,11 +129,18 @@ See [API.md](API.md) for the full API documentation with request/response exampl
 | `POST` | `/validate/phone` | Yes | Check if a phone number is on WhatsApp |
 | `GET` | `/contacts/:token` | Yes | List captured contacts for a device |
 | `DELETE` | `/cache` | Yes | Clear phone validation cache |
-| `GET` | `/ws` | No | WebSocket for real-time events |
+| `GET` | `/ws` | WS Auth | WebSocket for real-time events |
 
 ## WebSocket Events
 
-Connect to `ws://localhost:4010/ws` to receive real-time events.
+Connect to `ws://localhost:4010/ws` and authenticate with a first-message API key exchange:
+
+```js
+const ws = new WebSocket('ws://localhost:4010/ws');
+ws.onopen = () => ws.send(JSON.stringify({ type: 'auth', apiKey: 'YOUR_API_KEY' }));
+```
+
+**Security:** Origin whitelist (`WS_ALLOWED_ORIGINS`) blocks cross-site hijacking at upgrade time. First-message auth with constant-time key comparison blocks unauthorized access. Unauthenticated clients receive no broadcasts.
 
 | Event | Description |
 |---|---|

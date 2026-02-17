@@ -24,6 +24,7 @@ Base URL: `http://localhost:4010`
   - [Cache](#cache)
     - [`DELETE /cache`](#delete-cache)
 - [WebSocket](#websocket)
+  - [Authentication](#authentication)
   - [Events](#events)
     - [`qrcode`](#qrcode)
     - [`pairing-code`](#pairing-code)
@@ -405,13 +406,74 @@ Authorization: Bearer YOUR_API_KEY
 
 ### `GET /ws`
 
-Upgrade to WebSocket connection. No authentication required (browsers cannot set custom headers on WebSocket connections).
+Upgrade to WebSocket connection with two-layer security:
+
+1. **Origin whitelist** — checked at HTTP upgrade time (blocks cross-site WebSocket hijacking)
+2. **First-message auth** — client must authenticate with API key within timeout
 
 **URL:** `ws://localhost:4010/ws`
 
+### Authentication
+
+After connecting, the client must send an auth message within the configured timeout (default: 5 seconds):
+
+```json
+{"type": "auth", "apiKey": "YOUR_API_KEY"}
+```
+
+**Success response:**
+
+```json
+{"type": "auth", "success": true}
+```
+
+**Failure response:**
+
+```json
+{"type": "auth", "success": false, "message": "Invalid API key"}
+```
+
+If no auth message is sent within the timeout:
+
+```json
+{"type": "auth", "success": false, "message": "Authentication timeout"}
+```
+
+The connection is closed after any auth failure or timeout. Only authenticated clients receive broadcast messages.
+
+**Configuration:**
+
+| Variable | Default | Description |
+|---|---|---|
+| `WS_ALLOWED_ORIGINS` | `*` | Comma-separated list of allowed origins (e.g., `http://localhost:3000,https://app.example.com`). Set to `*` to allow all. |
+| `WS_AUTH_TIMEOUT` | `5` | Seconds to wait for auth message before disconnecting |
+
+**JavaScript client example:**
+
+```js
+const ws = new WebSocket('ws://localhost:4010/ws');
+
+ws.onopen = () => {
+    ws.send(JSON.stringify({ type: 'auth', apiKey: 'YOUR_API_KEY' }));
+};
+
+ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+
+    if (msg.type === 'auth') {
+        if (!msg.success) console.error('Auth failed:', msg.message);
+        return;
+    }
+
+    // Handle broadcast events
+    const { event: eventName, token, data, message } = msg;
+    // ...
+};
+```
+
 ### Events
 
-All messages are JSON objects with this structure:
+All broadcast messages are JSON objects with this structure:
 
 ```json
 {

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -57,8 +59,8 @@ func New(cfg *config.Config, manager *whatsapp.DeviceManager, hub *ws.Hub, dispa
 	app.Get("/health", healthHandler.Basic)
 	app.Get("/health/detailed", auth.Require(), healthHandler.Detailed)
 
-	// WebSocket (no auth — browser can't set headers)
-	wsHandler := handler.NewWS(hub)
+	// WebSocket (origin check + first-message auth)
+	wsHandler := handler.NewWS(hub, cfg.APIKey, time.Duration(cfg.WSAuthTimeout)*time.Second, cfg.WSAllowedOrigins, logger)
 	app.Get("/ws", wsHandler.Upgrade)
 
 	// Authenticated routes

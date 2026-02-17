@@ -40,6 +40,10 @@ type Config struct {
 
 	// Cache
 	CacheTTL int
+
+	// WebSocket
+	WSAllowedOrigins string
+	WSAuthTimeout    int
 }
 
 func Load() (*Config, error) {
@@ -64,6 +68,8 @@ func Load() (*Config, error) {
 		RateLimitMessages: getEnvInt("RATE_LIMIT_MESSAGES", 30),
 		RateLimitValidate: getEnvInt("RATE_LIMIT_VALIDATE", 60),
 		CacheTTL:          getEnvInt("CACHE_TTL_SECONDS", 3600),
+		WSAllowedOrigins:  getEnv("WS_ALLOWED_ORIGINS", "*"),
+		WSAuthTimeout:     getEnvInt("WS_AUTH_TIMEOUT", 5),
 	}
 
 	if err := cfg.validate(); err != nil {
@@ -79,6 +85,9 @@ func (c *Config) validate() error {
 	}
 	if c.Port < 1 || c.Port > 65535 {
 		return fmt.Errorf("PORT must be between 1 and 65535")
+	}
+	if c.WSAuthTimeout < 1 || c.WSAuthTimeout > 60 {
+		return fmt.Errorf("WS_AUTH_TIMEOUT must be between 1 and 60")
 	}
 	return nil
 }
